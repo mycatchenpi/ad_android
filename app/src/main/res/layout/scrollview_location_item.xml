@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/location_item"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_marginBottom="10dp"
+    tools:context=".LauncherActivity">
+    
+    <ImageView
+        android:id="@+id/location_image"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:src="@drawable/d0"
+        android:layout_marginLeft="10dp"
+        android:layout_marginBottom="3dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="left|center_vertical"
+        android:layout_gravity="center">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:id="@+id/location_song_name"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="3dp"
+                android:text="Location recommendation song"
+                android:textSize="18sp"
+                android:gravity="left|center_vertical"
+                android:layout_gravity="center"/>
+            <TextView
+                android:id="@+id/location_artist_name"
+                android:layout_width="260dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginBottom="3dp"
+                android:text="artist name"
+                android:textSize="12sp"
+                android:gravity="left|center_vertical"
+                android:layout_gravity="center"/>
+        </LinearLayout>
+
+<!--        <ImageView-->
+<!--            android:layout_width="26dp"-->
+<!--            android:layout_height="26dp"-->
+<!--            android:gravity="left|center_vertical"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:src="@drawable/favorite"-->
+<!--            android:layout_marginLeft="10dp"/>-->
+    </LinearLayout>
+</LinearLayout>

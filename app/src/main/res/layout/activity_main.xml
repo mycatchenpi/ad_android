@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/launcher_background_image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/background_spotify"/>
+
+    <TextView
+        android:id="@+id/launcher_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Spotify Player"
+        android:textSize="50sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/satisfy_regular"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="66dp"
+        android:layout_marginLeft="20dp"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/main_page"
+        android:layout_width="358dp"
+        android:layout_height="58dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="58dp"
+        android:background="@drawable/button_login"
+        android:fontFamily="@font/lexenddeca_variablefont_wght"
+        android:text="Main Page"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="28sp" />
+
+</RelativeLayout>
