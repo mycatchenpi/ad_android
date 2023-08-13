@@ -1,4 +1,4 @@
-package com.example.spotify.entity;
+package com.example.spotify.model.vo;
 
 public class PlaylistVO {
     private String url;

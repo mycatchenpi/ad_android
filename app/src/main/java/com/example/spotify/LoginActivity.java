@@ -13,12 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.example.spotify.dto.UserDTO;
-import com.example.spotify.entity.JsonResponseEntity;
+import com.example.spotify.model.dto.UserDTO;
 import com.example.spotify.util.RetrofitUtil;
-import com.google.gson.Gson;
-
-import java.io.IOException;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

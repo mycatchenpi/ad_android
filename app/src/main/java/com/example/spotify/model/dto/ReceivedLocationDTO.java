@@ -1,4 +1,4 @@
-package com.example.spotify.dto;
+package com.example.spotify.model.dto;
 
 public class ReceivedLocationDTO {
     private double latitude;

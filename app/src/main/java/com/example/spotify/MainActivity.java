@@ -27,8 +27,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.example.spotify.constant.CommonConstant;
-import com.example.spotify.dto.ReceivedLocationDTO;
-import com.example.spotify.dto.SongDTO;
+import com.example.spotify.model.dto.ReceivedLocationDTO;
+import com.example.spotify.model.dto.SongDTO;
 import com.example.spotify.util.RetrofitUtil;
 
 import java.util.HashMap;
@@ -331,10 +331,10 @@ public class MainActivity extends AppCompatActivity {
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件 打开网页
-                     Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                     startActivity(intent);
+                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    // startActivity(intent);
 
-                    //startActivity(song);
+                    startWebView(url);
 
                     Toast.makeText(MainActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
@@ -382,9 +382,10 @@ public class MainActivity extends AppCompatActivity {
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
+                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    // startActivity(intent);
 
+                    startWebView(url);
                     Toast.makeText(MainActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -431,8 +432,10 @@ public class MainActivity extends AppCompatActivity {
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
+                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    // startActivity(intent);
+
+                    startWebView(url);
 
                     Toast.makeText(MainActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
@@ -482,8 +485,10 @@ public class MainActivity extends AppCompatActivity {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
                             // 创建Intent打开URL
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
+                            // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            // startActivity(intent);
+
+                            startWebView(url);
                         }
                     }
                 });
@@ -536,8 +541,9 @@ public class MainActivity extends AppCompatActivity {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
                             // 创建Intent打开URL
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
+                            //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            //startActivity(intent);
+                            startWebView(url);
                         }
                     }
                 });
@@ -546,10 +552,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    private void startActivity(SongDTO track) {
-//        Intent intent = new Intent(MainActivity.this, PlayerActivity.class);
-//        intent.putExtra("trackUri", track.getUri());
-//        startActivity(intent);
-//    }
+    public void startWebView(String url) {
+        Intent webViewIntent = new Intent(MainActivity.this, SongWebViewActivity.class);
+        webViewIntent.putExtra("url", url);
+        startActivity(webViewIntent);
+    }
 
 }

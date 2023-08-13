@@ -5,10 +5,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebChromeClient;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,8 +23,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.example.spotify.entity.PlaylistVO;
-import com.example.spotify.entity.TrackVO;
+import com.example.spotify.model.vo.PlaylistVO;
+import com.example.spotify.model.vo.TrackVO;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -117,6 +124,7 @@ public class LauncherActivity extends AppCompatActivity {
                 startActivity(loginIntent);
             }
         });
+
     }
 
     private void addPlaylists(int numOfPlaylists, int[] imageArray, Map<Integer, PlaylistVO> playlistMap) {
@@ -146,11 +154,11 @@ public class LauncherActivity extends AppCompatActivity {
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件
-                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    startActivity(intent);
-
-//                    Intent intent = new Intent(LauncherActivity.this, PlaylistDetailsActivity.class);
+//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
 //                    startActivity(intent);
+
+                    startWebView(url);
+
                     Toast.makeText(LauncherActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -177,17 +185,18 @@ public class LauncherActivity extends AppCompatActivity {
                 nameView.setText(name); // Change this to your actual text
                 artistView.setText(artist);
                 index++;
-                locationItem.setTag(url); // 将url作为tag存储在View中
+                locationItem.setTag(url); // store url in view as tag
 
                 locationItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 处理点击事件
-                        String url = (String) v.getTag(); // 从View的tag中获取url
+                        String url = (String) v.getTag(); // access url from view tag
                         if (url != null && !url.isEmpty()) {
                             // 创建Intent打开URL
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
+//                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                            startActivity(intent);
+                            startWebView(url);
                         }
                     }
                 });
@@ -223,8 +232,9 @@ public class LauncherActivity extends AppCompatActivity {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
                             // 创建Intent打开URL
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            startActivity(intent);
+//                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                            startActivity(intent);
+                            startWebView(url);
                         }
                     }
                 });
@@ -233,6 +243,10 @@ public class LauncherActivity extends AppCompatActivity {
         }
     }
 
-
+    public void startWebView(String url) {
+        Intent webViewIntent = new Intent(LauncherActivity.this, SongWebViewActivity.class);
+        webViewIntent.putExtra("url", url);
+        startActivity(webViewIntent);
+    }
 
 }
