@@ -146,12 +146,12 @@ public class LauncherActivity extends AppCompatActivity {
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件
-//                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-//                    startActivity(intent);
-
-                    Intent intent = new Intent(LauncherActivity.this, PlaylistDetailsActivity.class);
+                    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
                     startActivity(intent);
-                    Toast.makeText(LauncherActivity.this, "点击了" + name,
+
+//                    Intent intent = new Intent(LauncherActivity.this, PlaylistDetailsActivity.class);
+//                    startActivity(intent);
+                    Toast.makeText(LauncherActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
                 }
             });
@@ -177,11 +177,24 @@ public class LauncherActivity extends AppCompatActivity {
                 nameView.setText(name); // Change this to your actual text
                 artistView.setText(artist);
                 index++;
+                locationItem.setTag(url); // 将url作为tag存储在View中
+
+                locationItem.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 处理点击事件
+                        String url = (String) v.getTag(); // 从View的tag中获取url
+                        if (url != null && !url.isEmpty()) {
+                            // 创建Intent打开URL
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                        }
+                    }
+                });
             }
             mLocationLinearLayout.addView(groupedItemLayout);
         }
     }
-
     private void addTimeTracks(int numOfTracks, int[] imageArray, Map<Integer, TrackVO> tracksMap) {
         int index = 0;
         for (int i = 0; i < numOfTracks; i++) {
@@ -201,6 +214,20 @@ public class LauncherActivity extends AppCompatActivity {
                 nameView.setText(name); // Change this to your actual text
                 artistView.setText(artist);
                 index++;
+                locationItem.setTag(url); // 将url作为tag存储在View中
+
+                locationItem.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // 处理点击事件
+                        String url = (String) v.getTag(); // 从View的tag中获取url
+                        if (url != null && !url.isEmpty()) {
+                            // 创建Intent打开URL
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            startActivity(intent);
+                        }
+                    }
+                });
             }
             mTimeLinearLayout.addView(timeGroupedItemLayout);
         }

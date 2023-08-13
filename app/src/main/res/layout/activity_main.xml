@@ -1,38 +1,212 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
 
-    <ImageView
-        android:id="@+id/launcher_background_image"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background_spotify"/>
-
-    <TextView
-        android:id="@+id/launcher_name"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Spotify Player"
-        android:textSize="50sp"
-        android:textColor="@color/white"
-        android:fontFamily="@font/satisfy_regular"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="66dp"
-        android:layout_marginLeft="20dp"/>
+        android:orientation="vertical">
 
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/main_page"
-        android:layout_width="358dp"
-        android:layout_height="58dp"
-        android:layout_alignParentBottom="true"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="58dp"
-        android:background="@drawable/button_login"
-        android:fontFamily="@font/lexenddeca_variablefont_wght"
-        android:text="Main Page"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="28sp" />
+        <LinearLayout
+            android:id="@+id/logout_layout"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginRight="10dp"
+            android:orientation="horizontal"
+            android:layout_gravity="right"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp">
 
-</RelativeLayout>
+            <TextView
+                android:id="@+id/hello_user"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:text="Hello User"
+                android:textSize="38dp"
+                android:textStyle="bold"
+                android:textColor="@color/spotify_green"
+                android:fontFamily="@font/satisfy_regular"
+                android:gravity="center"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/logout_btn"
+                android:layout_width="90dp"
+                android:layout_height="38dp"
+                android:text="Log out"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textAllCaps="false"
+                android:fontFamily="@font/lexenddeca_variablefont_wght"
+                android:background="@drawable/button_green"
+                android:layout_gravity="end|center_vertical"
+                android:gravity="center"/>
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+        <TextView
+            android:id="@+id/daily_Playlists_rec_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Daily Songs"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="10dp"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+            <LinearLayout
+                android:id="@+id/user_dailyPlaylists"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+
+        <TextView
+            android:id="@+id/location_rec_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Recommendation Songs"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/location_rec_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Location"
+            android:textSize="12sp"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="10dp"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/user_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+
+        <TextView
+            android:id="@+id/time_rec_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="At this Moment"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginLeft="10dp"/>
+
+        <TextView
+            android:id="@+id/time_rec_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time / Date"
+            android:textSize="12sp"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginBottom="12dp"
+            android:layout_marginLeft="10dp"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <LinearLayout
+                android:id="@+id/user_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+        <TextView
+            android:id="@+id/holiday_songs_rec_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Holiday Special"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="10dp"/>
+
+        <HorizontalScrollView
+            android:id="@+id/scrollview_holiday"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+
+            <LinearLayout
+                android:id="@+id/user_holiday_songs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+        <TextView
+            android:id="@+id/public_songs_rec_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Popular Songs"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:layout_marginBottom="8dp"
+            android:layout_marginLeft="10dp"/>
+
+        <HorizontalScrollView
+            android:id="@+id/scrollview_popular"
+            android:layout_width="match_parent"
+            android:layout_height="150dp">
+            <LinearLayout
+                android:id="@+id/user_popular_songs"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+            </LinearLayout>
+        </HorizontalScrollView>
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="10dp"/>
+    </LinearLayout>
+</ScrollView>

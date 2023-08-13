@@ -1,47 +1,57 @@
 package com.example.spotify.dto;
 
 public class SongDTO {
-    private String trackId;
-    private String songName;
-    private String artistName;
-    private String duration;
+    private String uri;
+    private String name;
+    private String artist;
+    private Integer duration;
 
-    public SongDTO(String trackId, String songName, String artistName, String duration) {
-        this.trackId = trackId;
-        this.songName = songName;
-        this.artistName = artistName;
+    private String imageUrl;
+
+    public SongDTO (String uri, String name, String artistName, Integer duration, String imageUrl) {
+        this.uri = uri;
+        this.name = name;
+        this.artist = artistName;
         this.duration = duration;
+        this.imageUrl = imageUrl;
+    }
+    public String getUri() {
+        return uri;
     }
 
-    public String getTrackId() {
-        return trackId;
+    public void setUri(String uri) {
+        this.uri = uri;
     }
 
-    public void setTrackId(String trackId) {
-        this.trackId = "https://open.spotify.com/track/" + trackId;
+    public String getName() {
+        return name;
     }
 
-    public String getSongName() {
-        return songName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public void setSongName(String songName) {
-        this.songName = songName;
+    public String getArtist() {
+        return artist;
     }
 
-    public String getArtistName() {
-        return artistName;
+    public void setArtist(String artistName) {
+        this.artist = artistName;
     }
 
-    public void setArtistName(String artistName) {
-        this.artistName = artistName;
-    }
-
-    public String getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(String duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

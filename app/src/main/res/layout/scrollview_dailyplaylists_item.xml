@@ -4,8 +4,7 @@
     android:id="@+id/item_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".LauncherActivity">
+    android:orientation="vertical">
 
     <ImageView
         android:id="@+id/daily_playlist_image"
@@ -20,6 +19,11 @@
         android:layout_width="125dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:text="playlistName"/>
+        android:text="playlistName"
+        android:ellipsize="end"
+        android:maxLines="1"/>
 
 </LinearLayout>
+
+    <!--    android:ellipsize="end" 属性，它会在文本超出 TextView 的宽度时，在末尾显示省略号。-->
+    <!--    android:maxLines="1" 属性，它将 TextView 的最大行数限制为 1，确保文本只占据一行-->

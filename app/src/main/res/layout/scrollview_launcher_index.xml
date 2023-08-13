@@ -14,12 +14,28 @@
 
         <LinearLayout
             android:id="@+id/login_layout"
-            android:layout_width="100dp"
-            android:layout_height="40dp"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
             android:layout_marginRight="10dp"
             android:orientation="horizontal"
             android:layout_gravity="right"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_gravity="start|center_vertical"
+                android:text="Welcome"
+                android:textSize="38dp"
+                android:textStyle="bold"
+                android:textColor="@color/spotify_green"
+                android:fontFamily="@font/satisfy_regular"
+                android:gravity="center"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/login_btn"
@@ -31,11 +47,15 @@
                 android:textAllCaps="false"
                 android:fontFamily="@font/lexenddeca_variablefont_wght"
                 android:background="@drawable/button_green"
-                android:layout_gravity="right" />
+                android:layout_gravity="end|center_vertical"
+                android:gravity="center"/>
         </LinearLayout>
 
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
     <TextView
-        android:id="@+id/dailyPlaylists"
+        android:id="@+id/daily_playlists_default"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Daily Playlists"
@@ -64,7 +84,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Songs You may like at ISS"
+        android:text="Mood"
         android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="@font/lexenddeca_variablefont_wght"
@@ -90,7 +110,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Night songs"
+        android:text="Chill"
         android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="@font/lexenddeca_variablefont_wght"

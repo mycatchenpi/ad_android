@@ -14,8 +14,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Spotify Player"
-        android:textSize="50sp"
-        android:textColor="@color/white"
+        android:textSize="60sp"
+        android:textColor="@color/spotify_green"
+        android:textStyle="bold"
         android:fontFamily="@font/satisfy_regular"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="66dp"
@@ -54,11 +55,11 @@
         android:layout_centerInParent="true"
         android:layout_marginTop="12dp"
         android:layout_marginBottom="54dp"
-        android:background="@drawable/button_login"
+        android:background="@drawable/button_green"
         android:fontFamily="@font/lexenddeca_variablefont_wght"
         android:text="Login"
         android:textAllCaps="false"
-        android:textColor="@color/black"
+        android:textColor="@color/white"
         android:textSize="28sp" />
 
 </RelativeLayout>

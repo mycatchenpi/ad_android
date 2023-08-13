@@ -5,6 +5,12 @@ public class ReceivedLocationDTO {
     private double longitude;
     private String username;
 
+    public ReceivedLocationDTO(double latitude, double longitude, String username) {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.username = username;
+    }
+
     public double getLatitude() {
         return latitude;
     }
