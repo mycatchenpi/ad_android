@@ -28,7 +28,7 @@ public interface ApiService {
     @POST("/after")
     Call<List<SongDTO>> getSongsAfterLogin(@Body ReceivedLocationDTO location);
 
-    @POST("/public")
-    Call<List<SongDTO>> getSongsPublic(@Body ReceivedLocationDTO location);
+    @GET("/publicForAndroid")
+    Call<List<SongDTO>> getSongsPublic();
 
 }

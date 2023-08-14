@@ -60,7 +60,7 @@ public class SongWebViewActivity extends AppCompatActivity {
             }
         });
 
-        mWebView.setWebViewClient(new WebViewClient());
+        mWebView.setWebViewClient(new MyWebViewClient());
         mWebView.loadUrl(mUrl);
     }
 
@@ -78,7 +78,5 @@ public class SongWebViewActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             return false;
         }
-
-
     }
 }

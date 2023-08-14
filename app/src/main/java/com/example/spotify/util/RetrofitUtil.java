@@ -1,23 +1,26 @@
 package com.example.spotify.util;
 
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitUtil {
-    private static Retrofit retrofit=new Retrofit.Builder()
-            .baseUrl("http://192.168.1.97:8080")
-            .addConverterFactory(GsonConverterFactory.create())
+    private static OkHttpClient okHttpClient = new OkHttpClient.Builder()
+            .connectTimeout(1, TimeUnit.MINUTES)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
             .build();
 
-    private static Retrofit retrofit_sportfy=new Retrofit.Builder()
-            .baseUrl("https://api.spotify.com")
+    private static Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://192.168.1.97:8080")
             .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
             .build();
 
     private static ApiService apiService = retrofit.create(ApiService.class);
-    private static ApiService apiService_sportfy = retrofit_sportfy.create(ApiService.class);
 
     public static Retrofit getRetrofit() {
         return retrofit;
@@ -27,9 +30,6 @@ public class RetrofitUtil {
         return apiService;
     }
     public static HashMap<String, String> headersMap = new HashMap<>();
-    public static ApiService getSportfyApiService() {
 
-        return apiService_sportfy;
-    }
 
 }

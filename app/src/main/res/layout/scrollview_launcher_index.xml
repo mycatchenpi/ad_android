@@ -58,7 +58,7 @@
         android:id="@+id/daily_playlists_default"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Daily Playlists"
+        android:text="Public Songs"
         android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="@font/lexenddeca_variablefont_wght"
@@ -81,15 +81,15 @@
         android:layout_width="match_parent"
         android:layout_height="10dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Mood"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:fontFamily="@font/lexenddeca_variablefont_wght"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="10dp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/lexenddeca_variablefont_wght"
+            android:text="More..."
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
     <HorizontalScrollView
         android:layout_width="match_parent"
@@ -110,7 +110,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Chill"
+        android:text="Many More..."
         android:textSize="20sp"
         android:textStyle="bold"
         android:fontFamily="@font/lexenddeca_variablefont_wght"

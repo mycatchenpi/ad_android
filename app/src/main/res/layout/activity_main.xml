@@ -179,33 +179,6 @@
         </HorizontalScrollView>
 
         <Space
-            android:layout_width="match_parent"
-            android:layout_height="10dp"/>
-        <TextView
-            android:id="@+id/public_songs_rec_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Popular Songs"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:fontFamily="@font/lexenddeca_variablefont_wght"
-            android:layout_marginBottom="8dp"
-            android:layout_marginLeft="10dp"/>
-
-        <HorizontalScrollView
-            android:id="@+id/scrollview_popular"
-            android:layout_width="match_parent"
-            android:layout_height="150dp">
-            <LinearLayout
-                android:id="@+id/user_popular_songs"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-            </LinearLayout>
-        </HorizontalScrollView>
-
-        <Space
             android:layout_width="0dp"
             android:layout_height="10dp"/>
     </LinearLayout>

@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mLocationLinearLayout;
     private LinearLayout mTimeLinearLayout;
     private LinearLayout mHolidayLayout;
-    private LinearLayout mUserPopularSongs;
+//    private LinearLayout mUserPopularSongs;
     private AppCompatButton mLogoutBtn;
     private TextView mHelloUser;
     private int mWidth;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         // daily playlists
         mLinearLayout = (LinearLayout) findViewById(R.id.user_dailyPlaylists);// 实例化线性布局
-        mLinearLayout.removeAllViews();// 删除以前的组件（如此保证每次都是horizontalscrollview中只有6个组件）
+        mLinearLayout.removeAllViews();// 删除以前的组件（保证每次都是 horizontalScrollview 中只有6个组件）
         showRecommendationDailySongs(username);
 
         // recommendation songs based on location
@@ -85,11 +85,6 @@ public class MainActivity extends AppCompatActivity {
         mHolidayLayout.removeAllViews();
         showRecommendationSongsBasedOnHoliday(username);
 
-        // recommended popular songs
-        mUserPopularSongs = (LinearLayout)findViewById(R.id.user_popular_songs);
-        mUserPopularSongs.removeAllViews();
-        showRecommendedPopularSongs(username);
-
         // Logout
         mLogoutBtn = (AppCompatButton) findViewById(R.id.logout_btn);
         mLogoutBtn.setOnClickListener(new View.OnClickListener() {
@@ -104,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 获得屏幕宽度
+     * get the width of phone screen
      */
     private void getDeviceWidth() {
         DisplayMetrics dm = new DisplayMetrics();// 获得屏幕分辨率
@@ -142,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     // call method to set and render page
-                    addLocationTracks(2, songsMap);
+                    addLocationTracks(recommendationSongs.size() / 3, songsMap);
                 } else {
                     Log.d("MainActivity", "Failed to get recommendation songs based on location");
                 }
@@ -156,7 +151,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRecommendationSongsBasedOnTime(String username) {
-
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getRecommendationSongByTime(
                 new ReceivedLocationDTO(1.3521, 103.8198, username));
         call.enqueue(new Callback<List<SongDTO>>() {
@@ -174,8 +168,7 @@ public class MainActivity extends AppCompatActivity {
                         songsMap.put(i, song);
                     }
 
-                    // call method to set and render page
-                    addTimeTracks(2, songsMap);
+                    addTimeTracks(recommendationSongs.size() / 3, songsMap);
                 } else {
                     Log.d("MainActivity", "Failed to get recommendation songs based on time");
                 }
@@ -189,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showRecommendationDailySongs(String username) {
-
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getSongsAfterLogin(
                 new ReceivedLocationDTO(1.3521, 103.8198, username));
         call.enqueue(new Callback<List<SongDTO>>() {
@@ -207,8 +199,7 @@ public class MainActivity extends AppCompatActivity {
                         songsMap.put(i, song);
                     }
 
-                    // call method to set and render page
-                    addDailySongs(6, songsMap);
+                    addDailySongs(recommendationSongs.size(), songsMap);
                 } else {
                     Log.d("MainActivity", "Failed to get daily recommendation songs");
                 }
@@ -221,41 +212,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void showRecommendedPopularSongs(String username) {
-
-        retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getSongsPublic(
-                new ReceivedLocationDTO(1.3521, 103.8198, username));
-        call.enqueue(new Callback<List<SongDTO>>() {
-            @Override
-            public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
-                if(response.isSuccessful()) {
-                    List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
-                        Log.d("popular songs: ", song.getName());
-                    }
-
-                    Map<Integer, SongDTO> songsMap = new HashMap<>();
-                    for(int i = 0; i < recommendationSongs.size(); i++) {
-                        SongDTO song = recommendationSongs.get(i);
-                        songsMap.put(i, song);
-                    }
-
-                    // call method to set and render page
-                    addPopularSongs(6, songsMap);
-                } else {
-                    Log.d("MainActivity", "Failed to get popular recommendation songs");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<List<SongDTO>> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-    }
-
     private void showRecommendationSongsBasedOnHoliday(String username) {
-
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().holidayCheck();
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
@@ -272,7 +229,7 @@ public class MainActivity extends AppCompatActivity {
                         songsMap.put(i, song);
                     }
                     // call method to set and render page
-                    addHolidaySongs(6, songsMap);
+                    addHolidaySongs(recommendationSongs.size(), songsMap);
 
                 } else {
                     // if currently not in a holiday duration, doesn't show holiday view
@@ -330,9 +287,6 @@ public class MainActivity extends AppCompatActivity {
 
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    // 处理点击事件 打开网页
-                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    // startActivity(intent);
 
                     startWebView(url);
 
@@ -366,8 +320,6 @@ public class MainActivity extends AppCompatActivity {
             String name = song.getName();
             mTextView.setText(name);
 
-
-            // dowload imageUrl
             Glide.with(this)
                     .load(imageUrl)
                     .into(new SimpleTarget<Drawable>() {
@@ -381,62 +333,7 @@ public class MainActivity extends AppCompatActivity {
 
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    // 处理点击事件
-                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    // startActivity(intent);
-
                     startWebView(url);
-                    Toast.makeText(MainActivity.this, "clicked " + name,
-                            Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-    }
-
-    private void addPopularSongs(int numOfPlaylists, Map<Integer, SongDTO> tracksMap) {
-
-        for (int i = 0; i < numOfPlaylists; i++) {// 在 horizontalscrollview中添加6个组件
-            int width = mWidth / 3;  // 首页显示3个playlists
-            LinearLayout itemLayout = (LinearLayout) LinearLayout.inflate(
-                    MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);// 动态实例化一个LinearLayout
-            itemLayout.setLayoutParams(new ViewGroup.LayoutParams(width,
-                    ViewGroup.LayoutParams.MATCH_PARENT));// 设置宽度为一张屏幕显示三个组件
-            itemLayout.setGravity(Gravity.CENTER_VERTICAL);// 设置垂直居中
-
-            ImageView mImageView = (ImageView) itemLayout
-                    .findViewById(R.id.daily_playlist_image);
-            TextView mTextView = (TextView) itemLayout
-                    .findViewById(R.id.daily_playlist_name);
-
-            // through key get value
-            SongDTO song = tracksMap.get(i);
-            String url = CommonConstant.TRACK_BASE_URL + song.getUri();
-            String imageUrl = song.getImageUrl();
-
-            String name = song.getName();
-            mTextView.setText(name);
-
-
-            // dowload imageUrl
-            Glide.with(this)
-                    .load(imageUrl)
-                    .into(new SimpleTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                            mImageView.setImageDrawable(resource); // 设置背景图片
-                        }
-                    });
-
-            mUserPopularSongs.addView(itemLayout);
-
-            itemLayout.setOnClickListener(new View.OnClickListener() {
-                public void onClick(View v) {
-                    // 处理点击事件
-                    // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    // startActivity(intent);
-
-                    startWebView(url);
-
                     Toast.makeText(MainActivity.this, "clicked " + name,
                             Toast.LENGTH_SHORT).show();
                 }
@@ -450,7 +347,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout groupedItemLayout = (LinearLayout) LinearLayout.inflate(
                     MainActivity.this, R.layout.scrollview_location_groupeditem, null);
-            //groupedItemLayout.setLayoutParams(new ViewGroup.LayoutParams(mWidth, ViewGroup.LayoutParams.MATCH_PARENT)); // Make sure the width is mWidth
             for (int j = 0; j < 3; j++) { // Assuming each grouped item contains 3 location items
                 View locationItem = groupedItemLayout.getChildAt(j);
                 ImageView imageView = locationItem.findViewById(R.id.location_image);
@@ -463,9 +359,9 @@ public class MainActivity extends AppCompatActivity {
                 String artist = track.getArtist();
                 String imageUrl = track.getImageUrl();
 
-                nameView.setText(name); // Change this to your actual text
+                nameView.setText(name);
                 artistView.setText(artist);
-                // dowload imageUrl
+
                 Glide.with(this)
                     .load(imageUrl)
                     .into(new SimpleTarget<Drawable>() {
@@ -477,17 +373,12 @@ public class MainActivity extends AppCompatActivity {
 
                 index++;
                 locationItem.setTag(url); // 将url作为tag存储在View中
-
                 locationItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         // 处理点击事件
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
-                            // 创建Intent打开URL
-                            // Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            // startActivity(intent);
-
                             startWebView(url);
                         }
                     }
@@ -503,8 +394,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout timeGroupedItemLayout = (LinearLayout) LinearLayout.inflate(
                     MainActivity.this, R.layout.scrollview_time_groupeditem, null);
-            //timeGroupedItemLayout.setLayoutParams(new ViewGroup.LayoutParams(mWidth, ViewGroup.LayoutParams.MATCH_PARENT)); // Make sure the width is mWidth
-            for (int j = 0; j < 3; j++) { // Assuming each grouped item contains 3 location items
+            // Assuming each grouped item contains 3 location items
+            for (int j = 0; j < 3; j++) {
                 View timeItem = timeGroupedItemLayout.getChildAt(j);
                 ImageView imageView = timeItem.findViewById(R.id.time_image);
                 TextView nameView = timeItem.findViewById(R.id.time_song_name);
@@ -519,6 +410,7 @@ public class MainActivity extends AppCompatActivity {
 
                 nameView.setText(name); // Change this to your actual text
                 artistView.setText(artist);
+
                 // dowload imageUrl
                 Glide.with(this)
                         .load(imageUrl)
@@ -535,14 +427,8 @@ public class MainActivity extends AppCompatActivity {
                 timeItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //startActivity(track);
-
-                        // 处理点击事件
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
-                            // 创建Intent打开URL
-                            //Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            //startActivity(intent);
                             startWebView(url);
                         }
                     }
