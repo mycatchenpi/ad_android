@@ -48,16 +48,6 @@ dependencies {
     // gson
     implementation ("com.google.code.gson:gson:2.10.1")
 
-    // spotify
-    //implementation ("com.spotify.android:auth:2.1.0") // Maven dependency
-//    implementation("com.spotify.android:auth:1.2.5")
-//    runtimeOnly ("androidx.browser:browser:1.5.0")
-//    runtimeOnly ("androidx.appcompat:appcompat:1.6.1")
-
-    // spotify android sdk file
-    implementation(fileTree(mapOf("dir" to "libs","include" to listOf("*.aar"))))
-    implementation("com.google.protobuf:protobuf-java:3.23.4")
-
     // glide for image download
     implementation ("com.github.bumptech.glide:glide:4.12.0")
     annotationProcessor ("com.github.bumptech.glide:compiler:4.12.0")

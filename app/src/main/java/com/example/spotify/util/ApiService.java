@@ -1,6 +1,7 @@
 package com.example.spotify.util;
 import com.example.spotify.model.dto.ReceivedLocationDTO;
 import com.example.spotify.model.dto.SongDTO;
+import com.example.spotify.model.dto.SongDataWithLocationDTO;
 import com.example.spotify.model.dto.UserDTO;
 
 import java.util.List;
@@ -30,5 +31,8 @@ public interface ApiService {
 
     @GET("/publicForAndroid")
     Call<List<SongDTO>> getSongsPublic();
+
+    @POST("/record")
+    Call<String> sendSongWithLocationRecord(@Body SongDataWithLocationDTO songWithLocationRecord);
 
 }

@@ -2,16 +2,26 @@ package com.example.spotify;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
@@ -29,7 +39,13 @@ import com.bumptech.glide.request.transition.Transition;
 import com.example.spotify.constant.CommonConstant;
 import com.example.spotify.model.dto.ReceivedLocationDTO;
 import com.example.spotify.model.dto.SongDTO;
+import com.example.spotify.model.dto.SongDataWithLocationDTO;
 import com.example.spotify.util.RetrofitUtil;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.HashMap;
 import java.util.List;
@@ -45,20 +61,24 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout mLocationLinearLayout;
     private LinearLayout mTimeLinearLayout;
     private LinearLayout mHolidayLayout;
-//    private LinearLayout mUserPopularSongs;
     private AppCompatButton mLogoutBtn;
     private TextView mHelloUser;
     private int mWidth;
-
+    private LocationCallback locationCallback;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationManager locationManager;
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
+        // request user permission for location
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //requestUserPermision();
+        checkLocationPermission();
 
-        String username = sp.getString("username", "");
+        String username = getUsername();
         mHelloUser = (TextView)findViewById(R.id.hello_user);
         mHelloUser.setText("Hello " + username);
 
@@ -91,11 +111,19 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 clear();
-                Toast.makeText(MainActivity.this, "Logout Succesfully!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
                 Intent loginIntent = new Intent(MainActivity.this, LauncherActivity.class);
                 startActivity(loginIntent);
             }
         });
+    }
+
+    private String getUsername() {
+        SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
+        String username = sp.getString("username", "");
+        return username;
     }
 
     /**
@@ -267,8 +295,10 @@ public class MainActivity extends AppCompatActivity {
 
             // through key get value
             SongDTO song = tracksMap.get(i);
-            String url = CommonConstant.TRACK_BASE_URL + song.getUri();
+            String uri = song.getUri();
+            String url = CommonConstant.TRACK_BASE_URL + uri;
             String imageUrl = song.getImageUrl();
+            Integer duration = song.getDuration();
 
             String name = song.getName();
             mTextView.setText(name);
@@ -287,11 +317,9 @@ public class MainActivity extends AppCompatActivity {
 
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-
+                    createLocationCallback(uri, getUsername());
+                    startLocationUpdates();
                     startWebView(url);
-
-                    Toast.makeText(MainActivity.this, "clicked " + name,
-                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -314,7 +342,8 @@ public class MainActivity extends AppCompatActivity {
 
             // through key get value
             SongDTO song = tracksMap.get(i);
-            String url = CommonConstant.TRACK_BASE_URL + song.getUri();
+            String uri = song.getUri();
+            String url = CommonConstant.TRACK_BASE_URL + uri;
             String imageUrl = song.getImageUrl();
 
             String name = song.getName();
@@ -354,7 +383,8 @@ public class MainActivity extends AppCompatActivity {
                 TextView artistView = locationItem.findViewById(R.id.location_artist_name);
 
                 SongDTO track = tracksMap.get(index);
-                String url = CommonConstant.TRACK_BASE_URL + track.getUri();
+                String uri = track.getUri();
+                String url = CommonConstant.TRACK_BASE_URL + uri;
                 String name = track.getName();
                 String artist = track.getArtist();
                 String imageUrl = track.getImageUrl();
@@ -379,6 +409,8 @@ public class MainActivity extends AppCompatActivity {
                         // 处理点击事件
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
+                            createLocationCallback(uri, getUsername());
+                            startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -402,8 +434,8 @@ public class MainActivity extends AppCompatActivity {
                 TextView artistView = timeItem.findViewById(R.id.time_artist_name);
 
                 SongDTO track = tracksMap.get(index);
-                String trackUri = track.getUri();
-                String url = CommonConstant.TRACK_BASE_URL + trackUri;
+                String uri = track.getUri();
+                String url = CommonConstant.TRACK_BASE_URL + uri;
                 String name = track.getName();
                 String artist = track.getArtist();
                 String imageUrl = track.getImageUrl();
@@ -429,6 +461,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
+                            createLocationCallback(uri, getUsername());
+                            startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -442,6 +476,127 @@ public class MainActivity extends AppCompatActivity {
         Intent webViewIntent = new Intent(MainActivity.this, SongWebViewActivity.class);
         webViewIntent.putExtra("url", url);
         startActivity(webViewIntent);
+    }
+
+    private void checkLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted
+                Toast.makeText(MainActivity.this, "Allowed to access location", Toast.LENGTH_SHORT).show();
+            } else {
+                // Create an AlertDialog to inform the user
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Permission Denied")
+                        .setMessage("Send location will help you access more attractive songs. Please enable it in your settings.")
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Open App System settings
+                                Intent intent = new Intent();
+                                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                                Uri uri = Uri.fromParts("package", getPackageName(), null);
+                                intent.setData(uri);
+                                startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("Cancel", null) // Add a "Cancel" button
+                        .show();
+            }
+        }
+    }
+
+    //This method is to start getting the location based on Latitude and Longitude
+    private void createLocationCallback(String uri, String username) {
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult != null) {
+                    Location location = locationResult.getLastLocation();
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        Log.d("latitude", String.valueOf(location.getLatitude()));
+                        Log.d("longitude", String.valueOf(location.getLongitude()));
+
+                        //Create a LocationData object to be sent to Java Backend
+                        SongDataWithLocationDTO.LocationData locationData = new SongDataWithLocationDTO.LocationData(latitude, longitude);
+                        SongDataWithLocationDTO songDataWithLocation = new SongDataWithLocationDTO(uri, locationData, username);
+
+                        // 延迟500ms
+                        Handler handler = new Handler();
+                        handler.postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                // 封装位置信息并发送到后端
+                                sendLocationToBackend(songDataWithLocation);
+                            }
+                        }, 500);
+                    }
+                }
+            }
+        };
+    }
+    
+    private void sendLocationToBackend(SongDataWithLocationDTO songDataWithLocation) {
+        // Send the location data to the backend using Retrofit
+        Call<String> call = RetrofitUtil.getApiService().sendSongWithLocationRecord(songDataWithLocation);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, retrofit2.Response<String> response) {
+                if (response.isSuccessful()) {
+                    // Handle success
+                    Log.d("MainActivity", "record successfully!");
+
+                } else {
+                    // Handle error
+                    Log.d("MainActivity", "record Failed!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
+    }
+
+    //This method is to update the location every 10000ms and 5000ms
+    //(these timing can be changed)
+    private void startLocationUpdates() {
+        LocationRequest locationRequest = LocationRequest.create();
+        locationRequest.setInterval(300000);  // Update interval in milliseconds (10 minutes)
+        locationRequest.setFastestInterval(100000);  // Fastest update interval in milliseconds (5 minutes)
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        if (ActivityCompat.checkSelfPermission(
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(
+                this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopLocationUpdates();
+    }
+
+    private void stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
 }

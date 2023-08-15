@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -39,7 +38,6 @@ public class LauncherActivity extends AppCompatActivity {
     private LinearLayout mTimeLinearLayout;
     private AppCompatButton mLoginBtn;
     private int mWidth;
-
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -283,5 +281,6 @@ public class LauncherActivity extends AppCompatActivity {
         webViewIntent.putExtra("url", url);
         startActivity(webViewIntent);
     }
-
 }
+
+
