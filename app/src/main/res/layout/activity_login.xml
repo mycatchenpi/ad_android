@@ -36,6 +36,7 @@
 
     <EditText
         android:id="@+id/password"
+        android:inputType="textPassword"
         android:layout_below="@+id/username"
         style="@style/EditTextStyle"
         android:layout_width="338dp"

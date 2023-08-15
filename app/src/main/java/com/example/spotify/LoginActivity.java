@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
@@ -33,9 +34,12 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         mUsername = (EditText) findViewById(R.id.username);
-        mPassword = (EditText) findViewById(R.id.password);
-        mLoginBtn = (AppCompatButton) findViewById(R.id.login_btn);
 
+        // hide password
+        mPassword = (EditText) findViewById(R.id.password);
+        mPassword.setTransformationMethod(PasswordTransformationMethod.getInstance());
+
+        mLoginBtn = (AppCompatButton) findViewById(R.id.login_btn);
         mLoginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

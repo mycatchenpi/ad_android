@@ -26,5 +26,5 @@ Access user location
             .build();
     
     How to get your ipv4 address?
-    Open command line, enter "ipconfig", press enter key, tehn you will see your ipv4 adress. 
+    Open command line, enter "ipconfig", press enter key, then you will see your ipv4 adress. 
     Replace baseUrl in Retrofit.Builder() with your own address.

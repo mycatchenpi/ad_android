@@ -31,5 +31,4 @@ public class RetrofitUtil {
     }
     public static HashMap<String, String> headersMap = new HashMap<>();
 
-
 }
