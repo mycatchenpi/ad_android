@@ -17,3 +17,14 @@ Download image
 
 ### google-play-services-location
 Access user location
+
+### configure your base url
+    private static Retrofit retrofit = new Retrofit.Builder()
+            .baseUrl("http://your ipv4 address:8080")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(okHttpClient)
+            .build();
+    
+    How to get your ipv4 address?
+    Open command line, enter "ipconfig", press enter key, tehn you will see your ipv4 adress. 
+    Replace baseUrl in Retrofit.Builder() with your own address.

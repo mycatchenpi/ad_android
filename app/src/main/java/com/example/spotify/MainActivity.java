@@ -67,12 +67,13 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // request user permission for location
+        // after user login, request user permission for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         checkLocationPermission();
 
@@ -83,8 +84,8 @@ public class MainActivity extends AppCompatActivity {
         getDeviceWidth();
 
         // daily playlists after user login
-        mLinearLayout = (LinearLayout) findViewById(R.id.user_dailyPlaylists);// 实例化线性布局
-        mLinearLayout.removeAllViews();// 删除以前的组件（保证每次都是 horizontalScrollview 中只有6个组件）
+        mLinearLayout = (LinearLayout) findViewById(R.id.user_dailyPlaylists);
+        mLinearLayout.removeAllViews();
         showRecommendationDailySongs(username);
 
         // recommendation songs based on location
@@ -116,6 +117,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // get username from shared preferences object
     private String getUsername() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -124,12 +126,14 @@ public class MainActivity extends AppCompatActivity {
         return username;
     }
 
+    // get screen width
     private void getDeviceWidth() {
-        DisplayMetrics dm = new DisplayMetrics();// 获得屏幕分辨率
+        DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         mWidth = dm.widthPixels;
     }
 
+    // when user click log out button, clear user info from shared preferences
     private void clear() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -141,11 +145,13 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
     }
 
+    // after user login, when user click back key
+    // will restart current homepage activity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
         if(keyCode == KeyEvent.KEYCODE_BACK) {
-            // 重新启动首页,清除任务栈
+            // restart homepage and keep tasks
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -335,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void addHolidaySongs(int numOfPlaylists, Map<Integer, SongDTO> tracksMap) {
 
-        for (int i = 0; i < numOfPlaylists; i++) {// 在 horizontalscrollview中添加6个组件
+        for (int i = 0; i < numOfPlaylists; i++) {// 在 horizontalScrollview中添加6个组件
             int width = mWidth / 3;  // 首页显示3个playlists
             LinearLayout itemLayout = (LinearLayout) LinearLayout.inflate(
                     MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);// 动态实例化一个LinearLayout
@@ -427,7 +433,6 @@ public class MainActivity extends AppCompatActivity {
             mLocationLinearLayout.addView(groupedItemLayout);
         }
     }
-
 
     private void addTimeTracks(int numOfTracks, Map<Integer, SongDTO> tracksMap) {
         int index = 0;
@@ -584,8 +589,8 @@ public class MainActivity extends AppCompatActivity {
     //(these timing can be changed)
     private void startLocationUpdates() {
         LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(300000);  // Update interval in milliseconds (10 minutes)
-        locationRequest.setFastestInterval(100000);  // Fastest update interval in milliseconds (5 minutes)
+        locationRequest.setInterval(300000);  // Update interval in milliseconds (5 minutes)
+        locationRequest.setFastestInterval(100000);  // Fastest update interval in milliseconds (2.5 minutes)
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         if (ActivityCompat.checkSelfPermission(

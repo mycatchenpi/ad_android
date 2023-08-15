@@ -52,7 +52,6 @@ public class LauncherActivity extends AppCompatActivity {
         Map<Integer, SongDTO> firstDefaultMap = new HashMap<>();
         Map<Integer, SongDTO> moreDefaultMap = new HashMap<>();
         Map<Integer, SongDTO> manyMoreDefaultMap = new HashMap<>();
-
         getAllDefaultRecommendationSongs(firstDefaultMap, moreDefaultMap, manyMoreDefaultMap );
     }
 
@@ -78,17 +77,12 @@ public class LauncherActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void disableBackButton() {
-        ActionBar actionBar = getActionBar();
-        actionBar.setHomeButtonEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(false);
-    }
-
     private void initView() {
 
         // daily public songs
-        mLinearLayout = (LinearLayout) findViewById(R.id.scrollview_dailyPlaylists);// 实例化线性布局
-        mLinearLayout.removeAllViews();// 删除以前的组件（如此保证每次都是horizontalscrollview中只有6个组件）
+        // removeAllViews(): delete previous components so that always only 6 / 12 components on our page
+        mLinearLayout = (LinearLayout) findViewById(R.id.scrollview_dailyPlaylists);
+        mLinearLayout.removeAllViews();
 
         // more songs
         mLocationLinearLayout = findViewById(R.id.scrollview_location);
@@ -136,7 +130,7 @@ public class LauncherActivity extends AppCompatActivity {
                     addMoreTracks(2, moreDefaultMap);
                     addManyMoreTracks(2, manyMoreDefaultMap);
                 } else {
-                    Log.d("LauncherActivity", "Failed to get popular recommendation songs");
+                    Log.d("LauncherActivity", "Failed to get public recommendation songs");
                 }
             }
 
@@ -153,7 +147,9 @@ public class LauncherActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             int width = mWidth / 3;
             LinearLayout itemLayout = (LinearLayout) LinearLayout.inflate(
-                    LauncherActivity.this, R.layout.scrollview_dailyplaylists_item, null);// 动态实例化一个LinearLayout
+                                        LauncherActivity.this,
+                                        R.layout.scrollview_dailyplaylists_item,
+                                        null);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
             itemLayout.setGravity(Gravity.CENTER_VERTICAL);  // 设置垂直居中
 
@@ -202,8 +198,9 @@ public class LauncherActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout groupedItemLayout = (LinearLayout) LinearLayout.inflate(
                     LauncherActivity.this, R.layout.scrollview_location_groupeditem, null);
-            //groupedItemLayout.setLayoutParams(new ViewGroup.LayoutParams(mWidth, ViewGroup.LayoutParams.MATCH_PARENT)); // Make sure the width is mWidth
-            for (int j = 0; j < 3; j++) { // Assuming each grouped item contains 3 location items
+
+            // Assuming each grouped item contains 3 location items
+            for (int j = 0; j < 3; j++) {
                 View moreItem = groupedItemLayout.getChildAt(j);
                 ImageView imageView = moreItem.findViewById(R.id.location_image);
                 TextView nameView = moreItem.findViewById(R.id.location_song_name);
@@ -222,8 +219,10 @@ public class LauncherActivity extends AppCompatActivity {
                         .load(imageUrl)
                         .into(new SimpleTarget<Drawable>() {
                             @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                imageView.setImageDrawable(resource); // 设置背景图片
+                            public void onResourceReady(@NonNull Drawable resource,
+                                                        @Nullable Transition<? super Drawable> transition) {
+                                // set background image for each component
+                                imageView.setImageDrawable(resource);
                             }
                         });
 
@@ -234,8 +233,8 @@ public class LauncherActivity extends AppCompatActivity {
                 moreItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // 处理点击事件
-                        String songUrl = (String) v.getTag(); // access url from view tag
+                        // access url from view tag
+                        String songUrl = (String) v.getTag();
                         if (songUrl != null && !songUrl.isEmpty()) {
                             startWebView(songUrl);
                         }
@@ -250,6 +249,7 @@ public class LauncherActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout manyMoreGroupItemLayout = (LinearLayout) LinearLayout.inflate(
                     LauncherActivity.this, R.layout.scrollview_time_groupeditem, null);
+
             // Assuming each grouped item contains 3 items
             for (int j = 0; j < 3; j++) {
                 View manyMoreItem = manyMoreGroupItemLayout.getChildAt(j);
