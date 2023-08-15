@@ -16,7 +16,11 @@ Connect to Java RESTFul API
 Download image
 
 ### google-play-services-location
-Access user location
+Access user location.
+
+For send latitude & longitude to Java RESTFul API using Android Studio Emulator, you need change the location manually.
+![customerize-location-settings-01](app/src/main/res/drawable/customerize_location_settings_01.png)
+![custermerize-location](app/src/main/res/drawable/customerize_location_02.png)
 
 ### configure your base url
     private static Retrofit retrofit = new Retrofit.Builder()

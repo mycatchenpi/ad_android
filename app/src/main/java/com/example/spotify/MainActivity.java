@@ -556,6 +556,8 @@ public class MainActivity extends AppCompatActivity {
                                 sendLocationToBackend(songDataWithLocation);
                             }
                         }, 500);
+                    } else {
+                        Log.d("Permision Denied", "Location permision needed for sending data to java restful api.");
                     }
                 }
             }
