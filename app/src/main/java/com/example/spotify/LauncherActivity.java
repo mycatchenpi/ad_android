@@ -1,11 +1,13 @@
 package com.example.spotify;
 
+import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -54,18 +56,34 @@ public class LauncherActivity extends AppCompatActivity {
         getAllDefaultRecommendationSongs(firstDefaultMap, moreDefaultMap, manyMoreDefaultMap );
     }
 
-    /**
-     * 获得屏幕宽度
-     */
     private void getDeviceWidth() {
         DisplayMetrics dm = new DisplayMetrics();// 获得屏幕分辨率
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         mWidth = dm.widthPixels;
     }
 
-    /**
-     * 初始化组件
-     */
+    // this page is the first page user will see
+    // so if users click back they will exit our app directly
+    // cause before this page there is no page anymore
+    // so that we start Launcher page again and finish current activity
+    // then user wont exit our app
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            startActivity(new Intent(this, LauncherActivity.class));
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    private void disableBackButton() {
+        ActionBar actionBar = getActionBar();
+        actionBar.setHomeButtonEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(false);
+    }
+
     private void initView() {
 
         // daily public songs
@@ -91,8 +109,9 @@ public class LauncherActivity extends AppCompatActivity {
         });
     }
 
-    private void getAllDefaultRecommendationSongs(Map<Integer, SongDTO> firstDefaultMap, Map<Integer, SongDTO> moreDefaultMap, Map<Integer, SongDTO> manyMoreDefaultMap) {
-
+    private void getAllDefaultRecommendationSongs(Map<Integer, SongDTO> firstDefaultMap,
+                                                  Map<Integer, SongDTO> moreDefaultMap,
+                                                  Map<Integer, SongDTO> manyMoreDefaultMap) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getSongsPublic();
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
@@ -108,7 +127,7 @@ public class LauncherActivity extends AppCompatActivity {
                         if(i < 6) {
                             firstDefaultMap.put(i, song);
                         } else if (i >= 6 && i < 12) {
-                           moreDefaultMap.put(i - 6, song);
+                            moreDefaultMap.put(i - 6, song);
                         } else {
                             manyMoreDefaultMap.put(i - 12, song);
                         }
@@ -129,8 +148,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private void addFirstDefaultSongs(int numOfTracks, Map<Integer, SongDTO> songs) {
-
-        // add 6 components in horizontalscrollview,
+        // add 6 components in horizontalScrollview,
         // int width = mWidth / 3  -> show 3 components on the default page width
         for (int i = 0; i < numOfTracks; i++) {
             int width = mWidth / 3;
@@ -174,7 +192,6 @@ public class LauncherActivity extends AppCompatActivity {
                     if (songUrl != null && !songUrl.isEmpty()) {
                         startWebView(songUrl);
                     }
-
                 }
             });
         }

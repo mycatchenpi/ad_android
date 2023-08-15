@@ -17,7 +17,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,6 +24,7 @@ import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
@@ -66,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
     private int mWidth;
     private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationClient;
-    private LocationManager locationManager;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
 
         // request user permission for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //requestUserPermision();
         checkLocationPermission();
 
         String username = getUsername();
@@ -84,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
         getDeviceWidth();
 
-        // daily playlists
+        // daily playlists after user login
         mLinearLayout = (LinearLayout) findViewById(R.id.user_dailyPlaylists);// 实例化线性布局
         mLinearLayout.removeAllViews();// 删除以前的组件（保证每次都是 horizontalScrollview 中只有6个组件）
         showRecommendationDailySongs(username);
@@ -126,9 +124,6 @@ public class MainActivity extends AppCompatActivity {
         return username;
     }
 
-    /**
-     * get the width of phone screen
-     */
     private void getDeviceWidth() {
         DisplayMetrics dm = new DisplayMetrics();// 获得屏幕分辨率
         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -144,6 +139,19 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("username", "");
         editor.putString("password", "");
         editor.commit();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+        if(keyCode == KeyEvent.KEYCODE_BACK) {
+            // 重新启动首页,清除任务栈
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     private void showRecommendationSongsBasedOnLocation(String username) {
@@ -548,7 +556,7 @@ public class MainActivity extends AppCompatActivity {
             }
         };
     }
-    
+
     private void sendLocationToBackend(SongDataWithLocationDTO songDataWithLocation) {
         // Send the location data to the backend using Retrofit
         Call<String> call = RetrofitUtil.getApiService().sendSongWithLocationRecord(songDataWithLocation);

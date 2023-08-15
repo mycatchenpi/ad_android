@@ -14,3 +14,6 @@ Connect to Java RESTFul API
 
 ### glide
 Download image
+
+### google-play-services-location
+Access user location
