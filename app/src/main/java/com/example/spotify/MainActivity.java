@@ -46,6 +46,8 @@ import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
+    private double savedLatitude;
+    private double savedLongitude;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,10 +79,10 @@ public class MainActivity extends AppCompatActivity {
 
         // after user login, request user permission for location
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        checkLocationPermission();
+        showRecommendationSongsBasedOnLocation();
 
         String username = getUsername();
-        mHelloUser = (TextView)findViewById(R.id.hello_user);
+        mHelloUser = (TextView) findViewById(R.id.hello_user);
         mHelloUser.setText("Hello " + username);
 
         getDeviceWidth();
@@ -91,7 +95,8 @@ public class MainActivity extends AppCompatActivity {
         // recommendation songs based on location
         mLocationLinearLayout = findViewById(R.id.user_location);
         mLocationLinearLayout.removeAllViews();
-        showRecommendationSongsBasedOnLocation(username);
+
+      //  showRecommendationSongsBasedOnLocation(username, 0,0);
 
         // recommendation songs based on time
         mTimeLinearLayout = (LinearLayout) findViewById(R.id.user_time);
@@ -99,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
         showRecommendationSongsBasedOnTime(username);
 
         // recommendation songs based on holiday
-        mHolidayLayout = (LinearLayout)findViewById(R.id.user_holiday_songs);
+        mHolidayLayout = (LinearLayout) findViewById(R.id.user_holiday_songs);
         mHolidayLayout.setVisibility(View.VISIBLE);
         mHolidayLayout.removeAllViews();
         showRecommendationSongsBasedOnHoliday(username);
@@ -150,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
 
-        if(keyCode == KeyEvent.KEYCODE_BACK) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
             // restart homepage and keep tasks
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -160,20 +165,31 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void showRecommendationSongsBasedOnLocation(String username) {
+    private void showRecommendationSongsBasedOnLocation() {
+        checkLocationPermission();
+        Task<Location> lastLocation = fusedLocationClient.getLastLocation();
+        lastLocation.addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), location.getLatitude(),location.getLongitude());
+            }
+        });
+    }
+
+    private void showRecommendationSongsBasedOnLocationRequestBackend(String username, double latitude, double longitude) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getRecommendationSongByLocation(
-                new ReceivedLocationDTO(1.3521, 103.8198, username));
+                new ReceivedLocationDTO(latitude, longitude, username));
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
+                    for (SongDTO song : recommendationSongs) {
                         Log.d("recommendationSongs location: ", song.getName());
                     }
 
                     Map<Integer, SongDTO> songsMap = new HashMap<>();
-                    for(int i = 0; i < recommendationSongs.size(); i++) {
+                    for (int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         songsMap.put(i, song);
                     }
@@ -198,14 +214,14 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
+                    for (SongDTO song : recommendationSongs) {
                         Log.d("recommendationSongs time: ", song.getName());
                     }
 
                     Map<Integer, SongDTO> songsMap = new HashMap<>();
-                    for(int i = 0; i < recommendationSongs.size(); i++) {
+                    for (int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         songsMap.put(i, song);
                     }
@@ -229,14 +245,14 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
+                    for (SongDTO song : recommendationSongs) {
                         Log.d("daily songs: ", song.getName());
                     }
 
                     Map<Integer, SongDTO> songsMap = new HashMap<>();
-                    for(int i = 0; i < recommendationSongs.size(); i++) {
+                    for (int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         songsMap.put(i, song);
                     }
@@ -259,14 +275,14 @@ public class MainActivity extends AppCompatActivity {
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
-                if(response.isSuccessful()) {
+                if (response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
+                    for (SongDTO song : recommendationSongs) {
                         Log.d("holiday songs: ", song.getName());
                     }
 
                     Map<Integer, SongDTO> songsMap = new HashMap<>();
-                    for(int i = 0; i < recommendationSongs.size(); i++) {
+                    for (int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         songsMap.put(i, song);
                     }
@@ -276,9 +292,9 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     // if currently not in a holiday duration, doesn't show holiday view
                     mHolidayLayout.setVisibility(View.GONE);
-                    HorizontalScrollView mScrollviewHoliday = (HorizontalScrollView)findViewById(R.id.scrollview_holiday);
+                    HorizontalScrollView mScrollviewHoliday = (HorizontalScrollView) findViewById(R.id.scrollview_holiday);
                     mScrollviewHoliday.setVisibility(View.GONE);
-                    TextView mHolidaySongsRecName = (TextView)findViewById(R.id.holiday_songs_rec_name);
+                    TextView mHolidaySongsRecName = (TextView) findViewById(R.id.holiday_songs_rec_name);
                     mHolidaySongsRecName.setVisibility(View.GONE);
                     Log.d("MainActivity", "Failed to get recommendation songs based on holiday");
                 }
@@ -331,8 +347,8 @@ public class MainActivity extends AppCompatActivity {
 
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
-                    createLocationCallback(uri, getUsername());
-                    startLocationUpdates();
+                    sendLocationToBackend(uri);
+                   // startLocationUpdates();
                     startWebView(url);
                 }
             });
@@ -407,13 +423,13 @@ public class MainActivity extends AppCompatActivity {
                 artistView.setText(artist);
 
                 Glide.with(this)
-                    .load(imageUrl)
-                    .into(new SimpleTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                            imageView.setImageDrawable(resource); // 设置背景图片
-                        }
-                    });
+                        .load(imageUrl)
+                        .into(new SimpleTarget<Drawable>() {
+                            @Override
+                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                                imageView.setImageDrawable(resource); // 设置背景图片
+                            }
+                        });
 
                 index++;
                 locationItem.setTag(url); // 将url作为tag存储在View中
@@ -423,8 +439,8 @@ public class MainActivity extends AppCompatActivity {
                         // 处理点击事件
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
-                            createLocationCallback(uri, getUsername());
-                            startLocationUpdates();
+                            sendLocationToBackend(uri);
+                            //startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -474,8 +490,8 @@ public class MainActivity extends AppCompatActivity {
                     public void onClick(View v) {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
-                            createLocationCallback(uri, getUsername());
-                            startLocationUpdates();
+                            sendLocationToBackend(uri);
+                           // startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -492,14 +508,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void checkLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
+       // createLocationCallbackAtFirst(getUsername());
+        if (isLocationPermission()) {
+            //startLocationUpdates();
+        } else {
+            showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), 0.0, 0.0);
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         }
     }
 
+    private boolean isLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            return false;
+        }
+        return true;
+    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -530,41 +556,42 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //This method is to start getting the location based on Latitude and Longitude
-    private void createLocationCallback(String uri, String username) {
-        locationCallback = new LocationCallback() {
+
+//    private void createLocationCallbackAtFirst(String username) {
+//        locationCallback = new LocationCallback() {
+//            @Override
+//            public void onLocationResult(LocationResult locationResult) {
+//                if (locationResult != null) {
+//                    Location location = locationResult.getLastLocation();
+//                    if (location != null) {
+//                        double latitude = location.getLatitude();
+//                        double longitude = location.getLongitude();
+//                        Log.d("latitude", String.valueOf(location.getLatitude()));
+//                        Log.d("longitude", String.valueOf(location.getLongitude()));
+//                    } else {
+//                        Log.d("Permision Denied", "Location permision needed for sending data to java restful api.");
+//                    }
+//                } else {
+//                    Log.d("Locationnull", "Location is null");
+//                }
+//            }
+//        };
+//    }
+
+    private void sendLocationToBackend(String uri) {
+        checkLocationPermission();
+        Task<Location> lastLocation = fusedLocationClient.getLastLocation();
+        lastLocation.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult != null) {
-                    Location location = locationResult.getLastLocation();
-                    if (location != null) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        Log.d("latitude", String.valueOf(location.getLatitude()));
-                        Log.d("longitude", String.valueOf(location.getLongitude()));
-
-                        //Create a LocationData object to be sent to Java Backend
-                        SongDataWithLocationDTO.LocationData locationData = new SongDataWithLocationDTO.LocationData(latitude, longitude);
-                        SongDataWithLocationDTO songDataWithLocation = new SongDataWithLocationDTO(uri, locationData, username);
-
-                        // 延迟500ms
-                        Handler handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                // 封装位置信息并发送到后端
-                                sendLocationToBackend(songDataWithLocation);
-                            }
-                        }, 500);
-                    } else {
-                        Log.d("Permision Denied", "Location permision needed for sending data to java restful api.");
-                    }
-                }
+            public void onSuccess(Location location) {
+                SongDataWithLocationDTO.LocationData locationData = new SongDataWithLocationDTO.LocationData(location.getLatitude(), location.getLongitude());
+                SongDataWithLocationDTO songDataWithLocation = new SongDataWithLocationDTO(uri, locationData, getUsername());
+                getLocationAndSendToBackend(songDataWithLocation);
             }
-        };
+        });
     }
 
-    private void sendLocationToBackend(SongDataWithLocationDTO songDataWithLocation) {
+    private void getLocationAndSendToBackend(SongDataWithLocationDTO songDataWithLocation) {
         // Send the location data to the backend using Retrofit
         Call<String> call = RetrofitUtil.getApiService().sendSongWithLocationRecord(songDataWithLocation);
         call.enqueue(new Callback<String>() {
@@ -587,23 +614,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    //This method is to update the location every 10000ms and 5000ms
-    //(these timing can be changed)
-    private void startLocationUpdates() {
-        LocationRequest locationRequest = LocationRequest.create();
-        locationRequest.setInterval(300000);  // Update interval in milliseconds (5 minutes)
-        locationRequest.setFastestInterval(100000);  // Fastest update interval in milliseconds (2.5 minutes)
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        if (ActivityCompat.checkSelfPermission(
-                this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(
-                this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, null);
-    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -612,6 +622,27 @@ public class MainActivity extends AppCompatActivity {
 
     private void stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback);
+    }
+
+    // after user granted for location permission from settings page
+    // refresh main page with permission s
+    // so that can get current location and send it to java backend
+    // then we can update our main page data with recommendation songs based on location
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isLocationPermission()) {
+            // if user granted location permission, refresh page
+            refreshPage();
+        }
+    }
+
+    private void refreshPage() {
+        // 执行页面刷新逻辑，例如重新获取位置信息并更新UI
+        // send location to java backend
+        // then can get recommendation songs from java backend
+
+        showRecommendationSongsBasedOnLocation();
     }
 
 }
