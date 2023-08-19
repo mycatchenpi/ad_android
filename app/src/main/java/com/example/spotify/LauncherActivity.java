@@ -1,6 +1,5 @@
 package com.example.spotify;
 
-import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -55,30 +54,7 @@ public class LauncherActivity extends AppCompatActivity {
         getAllDefaultRecommendationSongs(firstDefaultMap, moreDefaultMap, manyMoreDefaultMap );
     }
 
-    private void getDeviceWidth() {
-        DisplayMetrics dm = new DisplayMetrics();// 获得屏幕分辨率
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        mWidth = dm.widthPixels;
-    }
-
-    // this page is the first page user will see
-    // so if users click back they will exit our app directly
-    // cause before this page there is no page anymore
-    // so that we start Launcher page again and finish current activity
-    // then user wont exit our app
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-
-            startActivity(new Intent(this, LauncherActivity.class));
-            finish();
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
     private void initView() {
-
         // daily public songs
         // removeAllViews(): delete previous components so that always only 6 / 12 components on our page
         mLinearLayout = (LinearLayout) findViewById(R.id.scrollview_dailyPlaylists);
@@ -103,6 +79,24 @@ public class LauncherActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * get the width and DisplayMetrics of user's device
+     * DisplayMetrics include widthPixels, heightPixels, density...
+     */
+    private void getDeviceWidth() {
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        mWidth = dm.widthPixels;
+    }
+
+    /**
+     * get 18 recommended public songs from Java restful api
+     * and store them in 3 maps
+     *
+     * @param firstDefaultMap songs with index for Pubic Songs display
+     * @param moreDefaultMap songs with index for More songs display
+     * @param manyMoreDefaultMap songs with index for Many More songs display
+     */
     private void getAllDefaultRecommendationSongs(Map<Integer, SongDTO> firstDefaultMap,
                                                   Map<Integer, SongDTO> moreDefaultMap,
                                                   Map<Integer, SongDTO> manyMoreDefaultMap) {
@@ -112,10 +106,6 @@ public class LauncherActivity extends AppCompatActivity {
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
                 if(response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for(SongDTO song: recommendationSongs) {
-                        Log.d("popular songs: ", song.getName());
-                    }
-
                     for(int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         if(i < 6) {
@@ -151,8 +141,7 @@ public class LauncherActivity extends AppCompatActivity {
                                         R.layout.scrollview_dailyplaylists_item,
                                         null);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(width, ViewGroup.LayoutParams.MATCH_PARENT));
-            itemLayout.setGravity(Gravity.CENTER_VERTICAL);  // 设置垂直居中
-
+            itemLayout.setGravity(Gravity.CENTER_VERTICAL);
             ImageView mImageView = (ImageView) itemLayout.findViewById(R.id.daily_playlist_image);
             TextView mTextView = (TextView) itemLayout.findViewById(R.id.daily_playlist_name);
 
@@ -167,20 +156,12 @@ public class LauncherActivity extends AppCompatActivity {
                 mTextView.setText(songName);
 
                 // download and set background image
-                Glide.with(this)
-                        .load(imageUrl)
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                mImageView.setImageDrawable(resource);
-                            }
-                        });
+                glideDownloadImage(imageUrl, mImageView);
             } else {
                 Log.d("LauncherActivity", "Song at index " + i + " is null");
             }
 
             mLinearLayout.addView(itemLayout);
-
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     // 处理点击事件
@@ -212,24 +193,13 @@ public class LauncherActivity extends AppCompatActivity {
                 String imageUrl = song.getImageUrl();
                 String songName = song.getName();
                 String artistName = song.getArtist();
-                nameView.setText(songName); // Change this to your actual text
+                nameView.setText(songName);
                 artistView.setText(artistName);
-
-                Glide.with(this)
-                        .load(imageUrl)
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource,
-                                                        @Nullable Transition<? super Drawable> transition) {
-                                // set background image for each component
-                                imageView.setImageDrawable(resource);
-                            }
-                        });
-
+                glideDownloadImage(imageUrl, imageView);
                 index++;
+
                 // store url in view as tag
                 moreItem.setTag(songUrl);
-
                 moreItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -263,26 +233,15 @@ public class LauncherActivity extends AppCompatActivity {
                 String imageUrl = song.getImageUrl();
                 String songName = song.getName();
                 String artistName = song.getArtist();
-                nameView.setText(songName); // Change this to your actual text
+                nameView.setText(songName);
                 artistView.setText(artistName);
-
-                Glide.with(this)
-                        .load(imageUrl)
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                imageView.setImageDrawable(resource); // 设置背景图片
-                            }
-                        });
-
+                glideDownloadImage(imageUrl, imageView);
                 index++;
-                manyMoreItem.setTag(songUrl); // 将url作为tag存储在View中
-
+                manyMoreItem.setTag(songUrl);
                 manyMoreItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // 处理点击事件
-                        String songUrl = (String) v.getTag(); // 从View的tag中获取url
+                        String songUrl = (String) v.getTag();
                         if (songUrl != null && !songUrl.isEmpty()) {
                             startWebView(songUrl);
                         }
@@ -293,10 +252,51 @@ public class LauncherActivity extends AppCompatActivity {
         }
     }
 
-    public void startWebView(String url) {
+    /**
+     * utilize Glide framework for image downloading
+     * @param imageUrl the url for downloading an image
+     * @param imageView the view which will use image as background
+     */
+    private void glideDownloadImage(String imageUrl, ImageView imageView ) {
+        Glide.with(this)
+                .load(imageUrl)
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        imageView.setImageDrawable(resource);
+                    }
+                });
+    }
+
+    /**
+     * after user click a item, redirect them to a webView
+     * @param url the weblink of a recommended song
+     */
+    private void startWebView(String url) {
         Intent webViewIntent = new Intent(LauncherActivity.this, SongWebViewActivity.class);
         webViewIntent.putExtra("url", url);
         startActivity(webViewIntent);
+    }
+
+    /**
+     * this page is the first page user will see
+     * so if users click back they will exit our app directly
+     * cause before this page there is no page anymore
+     * so that we start Launcher page again and finish current activity
+     * then user wont exit our app
+     *
+     * @param keyCode The value in event.getKeyCode().
+     * @param event Description of the key event.
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+
+            startActivity(new Intent(this, LauncherActivity.class));
+            finish();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }
 

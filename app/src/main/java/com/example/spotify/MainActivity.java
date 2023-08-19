@@ -9,7 +9,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -65,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -111,21 +109,28 @@ public class MainActivity extends AppCompatActivity {
         logout(mLogoutBtn);
     }
 
-    // get username from shared preferences object
+    /**
+     * get username from shared preferences object
+     * @return username
+     */
     private String getUsername() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         String username = sp.getString("username", "");
         return username;
     }
 
-    // get screen width
+    /**
+     * get screen width
+     */
     private void getDeviceWidth() {
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         mWidth = dm.widthPixels;
     }
 
-    // logout
+    /**
+     * logout
+     */
     private void logout(View v) {
         v.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,7 +143,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // when user click log out button, clear user info from shared preferences
+    /**
+     *  when user click log out button, clear user info from shared preferences
+     */
     private void clear() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
@@ -147,8 +154,12 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
     }
 
-    // after user login, when user click back key
-    // will restart current homepage activity instead of go back to login page
+    /**
+     * after user login, when user click back key
+     * will restart current homepage activity instead of go back to login page
+     * @param keyCode The value in event.getKeyCode().
+     * @param event Description of the key event.
+     */
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
@@ -161,9 +172,11 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    // after user login, check their location permission first
-    // if granted, send current location to java restful api to get recommended songs
-    // if didn't grant, request location permission
+    /**
+     * after user login, check their location permission first
+     * if granted, send current location to java restful api to get recommended songs
+     * if didn't grant, request location permission
+     */
     private void showRecommendationSongsBasedOnLocation() {
         checkLocationPermission();
         Task<Location> lastLocation = fusedLocationClient.getLastLocation();
@@ -175,7 +188,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // utilize retrofit2 for connecting and accessing data from java restful api
+    /**
+     * utilize retrofit2 for connecting and accessing recommended songs based on location from java restful api
+     * @param username the name user use for login
+     * @param latitude a double value indicates latitude of a location
+     * @param longitude a double value indicates longitude of a location
+     */
     private void showRecommendationSongsBasedOnLocationRequestBackend(String username, double latitude, double longitude) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getRecommendationSongByLocation(
                 new ReceivedLocationDTO(latitude, longitude, username));
@@ -208,9 +226,13 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * utilize retrofit2 for connecting and accessing recommended songs based on time from java restful api
+     * @param username the name user use for login
+     */
     private void showRecommendationSongsBasedOnTime(String username) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getRecommendationSongByTime(
-                new ReceivedLocationDTO(1.3521, 103.8198, username));
+                new ReceivedLocationDTO(0.0, 0.0, username));
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
@@ -239,24 +261,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * utilize retrofit2 for connecting and accessing recommended daily songs from java restful api
+     * @param username the name user use for login
+     */
     private void showRecommendationDailySongs(String username) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getSongsAfterLogin(
-                new ReceivedLocationDTO(1.3521, 103.8198, username));
+                new ReceivedLocationDTO(0.0, 0.0, username));
         call.enqueue(new Callback<List<SongDTO>>() {
             @Override
             public void onResponse(Call<List<SongDTO>> call, Response<List<SongDTO>> response) {
                 if (response.isSuccessful()) {
                     List<SongDTO> recommendationSongs = response.body();
-                    for (SongDTO song : recommendationSongs) {
-                        Log.d("daily songs: ", song.getName());
-                    }
-
                     Map<Integer, SongDTO> songsMap = new HashMap<>();
                     for (int i = 0; i < recommendationSongs.size(); i++) {
                         SongDTO song = recommendationSongs.get(i);
                         songsMap.put(i, song);
                     }
-
                     addDailySongs(recommendationSongs.size(), songsMap);
                 } else {
                     Log.d("MainActivity", "Failed to get daily recommendation songs");
@@ -270,6 +291,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * utilize retrofit2 for connecting and accessing recommended songs based on holiday from java restful api
+     * @param username
+     */
     private void showRecommendationSongsBasedOnHoliday(String username) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().holidayCheck();
         call.enqueue(new Callback<List<SongDTO>>() {
@@ -288,7 +313,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                     // call method to set and render page
                     addHolidaySongs(recommendationSongs.size(), songsMap);
-
                 } else {
                     // if currently not in a holiday duration, doesn't show holiday view
                     mHolidayLayout.setVisibility(View.GONE);
@@ -307,16 +331,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * render image and song info
+     * @param numOfPlaylists the number of recommended songs
+     * @param tracksMap store recommended song obj with index
+     */
     private void addDailySongs(int numOfPlaylists, Map<Integer, SongDTO> tracksMap) {
-
-        for (int i = 0; i < numOfPlaylists; i++) {  // 在 horizontalscrollview中添加6个组件
-            int width = mWidth / 3;  // 首页显示3个playlists
+        // add 6 components in horizontalScrollview
+        // int width = mWidth / 3  -> show 3 components on the default page width
+        for (int i = 0; i < numOfPlaylists; i++) {
+            int width = mWidth / 3;
             LinearLayout itemLayout = (LinearLayout) LinearLayout.inflate(
-                    MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);// 动态实例化一个LinearLayout
+                    MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);
+            // set width with value 3
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(width,
-                    ViewGroup.LayoutParams.MATCH_PARENT));// 设置宽度为一张屏幕显示三个组件
-            itemLayout.setGravity(Gravity.CENTER_VERTICAL);// 设置垂直居中
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            itemLayout.setGravity(Gravity.CENTER_VERTICAL);
 
             ImageView mImageView = (ImageView) itemLayout
                     .findViewById(R.id.daily_playlist_image);
@@ -333,22 +363,13 @@ public class MainActivity extends AppCompatActivity {
             String name = song.getName();
             mTextView.setText(name);
 
-            // dowload imageUrl
-            Glide.with(this)
-                    .load(imageUrl)
-                    .into(new SimpleTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                            mImageView.setImageDrawable(resource); // 设置背景图片
-                        }
-                    });
+            // download image
+            glideDownloadImage(imageUrl, mImageView);
 
             mLinearLayout.addView(itemLayout);
-
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     sendLocationToBackend(uri);
-                   // startLocationUpdates();
                     startWebView(url);
                 }
             });
@@ -356,14 +377,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addHolidaySongs(int numOfPlaylists, Map<Integer, SongDTO> tracksMap) {
-
-        for (int i = 0; i < numOfPlaylists; i++) {// 在 horizontalScrollview中添加6个组件
-            int width = mWidth / 3;  // 首页显示3个playlists
+        for (int i = 0; i < numOfPlaylists; i++) {
+            int width = mWidth / 3;
             LinearLayout itemLayout = (LinearLayout) LinearLayout.inflate(
-                    MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);// 动态实例化一个LinearLayout
+                    MainActivity.this, R.layout.scrollview_dailyplaylists_item, null);
             itemLayout.setLayoutParams(new ViewGroup.LayoutParams(width,
-                    ViewGroup.LayoutParams.MATCH_PARENT));// 设置宽度为一张屏幕显示三个组件
-            itemLayout.setGravity(Gravity.CENTER_VERTICAL);// 设置垂直居中
+                    ViewGroup.LayoutParams.MATCH_PARENT));
+            itemLayout.setGravity(Gravity.CENTER_VERTICAL);
 
             ImageView mImageView = (ImageView) itemLayout
                     .findViewById(R.id.daily_playlist_image);
@@ -379,17 +399,9 @@ public class MainActivity extends AppCompatActivity {
             String name = song.getName();
             mTextView.setText(name);
 
-            Glide.with(this)
-                    .load(imageUrl)
-                    .into(new SimpleTarget<Drawable>() {
-                        @Override
-                        public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                            mImageView.setImageDrawable(resource); // 设置背景图片
-                        }
-                    });
-
+            // download and set image
+            glideDownloadImage(imageUrl, mImageView);
             mHolidayLayout.addView(itemLayout);
-
             itemLayout.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     startWebView(url);
@@ -422,23 +434,15 @@ public class MainActivity extends AppCompatActivity {
 
                 nameView.setText(name);
                 artistView.setText(artist);
-
-                Glide.with(this)
-                        .load(imageUrl)
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                              imageView.setImageDrawable(resource); // 设置背景图片
-                            }
-                        });
-
+                // download image
+                glideDownloadImage(imageUrl,imageView);
                 index++;
-                locationItem.setTag(url); // 将url作为tag存储在View中
+                // store tag to view and then we can get this value from view
+                locationItem.setTag(url);
                 locationItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // 处理点击事件
-                        String url = (String) v.getTag(); // 从View的tag中获取url
+                        String url = (String) v.getTag();
                         if (url != null && !url.isEmpty()) {
                             sendLocationToBackend(uri);
                             startWebView(url);
@@ -455,7 +459,6 @@ public class MainActivity extends AppCompatActivity {
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout timeGroupedItemLayout = (LinearLayout) LinearLayout.inflate(
                     MainActivity.this, R.layout.scrollview_time_groupeditem, null);
-            // Assuming each grouped item contains 3 location items
             for (int j = 0; j < 3; j++) {
                 View timeItem = timeGroupedItemLayout.getChildAt(j);
                 ImageView imageView = timeItem.findViewById(R.id.time_image);
@@ -469,26 +472,16 @@ public class MainActivity extends AppCompatActivity {
                 String artist = track.getArtist();
                 String imageUrl = track.getImageUrl();
 
-                nameView.setText(name); // Change this to your actual text
+                nameView.setText(name);
                 artistView.setText(artist);
-
-                // dowload imageUrl
-                Glide.with(this)
-                        .load(imageUrl)
-                        .into(new SimpleTarget<Drawable>() {
-                            @Override
-                            public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                              imageView.setImageDrawable(resource); // 设置背景图片
-                            }
-                        });
-
+                // download image
+                glideDownloadImage(imageUrl, imageView);
                 index++;
-                timeItem.setTag(url); // 将url作为tag存储在View中
-
+                timeItem.setTag(url);
                 timeItem.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        String url = (String) v.getTag(); // 从View的tag中获取url
+                        String url = (String) v.getTag();
                         if (url != null && !url.isEmpty()) {
                             sendLocationToBackend(uri);
                             startWebView(url);
@@ -500,16 +493,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * utilize Glide framework for image downloading
+     * @param imageUrl the url for downloading an image
+     * @param mImageView the view which will use image as background
+     */
+    private void glideDownloadImage(String imageUrl, ImageView mImageView) {
+        Glide.with(this)
+                .load(imageUrl)
+                .into(new SimpleTarget<Drawable>() {
+                    @Override
+                    public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
+                        mImageView.setImageDrawable(resource); // 设置背景图片
+                    }
+                });
+    }
+
+    /**
+     * after user click a item, redirect them to a webView
+     * @param url the weblink of a recommended song
+     */
     public void startWebView(String url) {
         Intent webViewIntent = new Intent(MainActivity.this, SongWebViewActivity.class);
         webViewIntent.putExtra("url", url);
         startActivity(webViewIntent);
     }
 
+    /**
+     * if isLocationPermission() return true, location permission granted
+     * else location permission denied, set latitude = 0.0 & longitude = 0.0 and request for location permission
+     */
     private void checkLocationPermission() {
-       // createLocationCallbackAtFirst(getUsername());
         if (isLocationPermission()) {
-            //startLocationUpdates();
         } else {
             showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), 0.0, 0.0);
             ActivityCompat.requestPermissions(this,
@@ -518,6 +533,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * check if user grated location permission
+     * @return if granted, return true; else, return false
+     */
     private boolean isLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -526,6 +545,17 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * receive the outcome after request for location permission
+     * if user granted, prompt a message for success info
+     * if user denied, prompt a AlertDialog guiding user go to settings page allowing location permission
+     *
+     * @param requestCode The request code passed in
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -555,28 +585,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-//    private void createLocationCallbackAtFirst(String username) {
-//        locationCallback = new LocationCallback() {
-//            @Override
-//            public void onLocationResult(LocationResult locationResult) {
-//                if (locationResult != null) {
-//                    Location location = locationResult.getLastLocation();
-//                    if (location != null) {
-//                        double latitude = location.getLatitude();
-//                        double longitude = location.getLongitude();
-//                        Log.d("latitude", String.valueOf(location.getLatitude()));
-//                        Log.d("longitude", String.valueOf(location.getLongitude()));
-//                    } else {
-//                        Log.d("Permision Denied", "Location permision needed for sending data to java restful api.");
-//                    }
-//                } else {
-//                    Log.d("Locationnull", "Location is null");
-//                }
-//            }
-//        };
-//    }
-
+    /**
+     * after user login, will call this method for location accessing
+     * @param uri the uri of a song
+     */
     private void sendLocationToBackend(String uri) {
         checkLocationPermission();
         Task<Location> lastLocation = fusedLocationClient.getLastLocation();
@@ -590,6 +602,10 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * utilize retrofit2 for connecting with Java restful api for accessing recommend songs based on current location
+     * @param songDataWithLocation an obj encapsulates songUri, location obj, and username
+     */
     private void getLocationAndSendToBackend(SongDataWithLocationDTO songDataWithLocation) {
         // Send the location data to the backend using Retrofit
         Call<String> call = RetrofitUtil.getApiService().sendSongWithLocationRecord(songDataWithLocation);
@@ -613,20 +629,12 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        stopLocationUpdates();
-//    }
-
-//    private void stopLocationUpdates() {
-//        fusedLocationClient.removeLocationUpdates(locationCallback);
-//    }
-
-    // after user granted for location permission from settings page
-    // refresh main page with permission s
-    // so that can get current location and send it to java backend
-    // then we can update our main page data with recommendation songs based on location
+    /**
+     * after user granted for location permission from settings page
+     * refresh main page with permission
+     * so that can get current location and send it to java backend
+     * then we can update our main page data with recommendation songs based on location
+     */
     @Override
     protected void onResume() {
         super.onResume();
@@ -636,11 +644,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * send location to java backend
+     * then can get recommendation songs from java backend
+     */
     private void refreshPage() {
-        // 执行页面刷新逻辑，例如重新获取位置信息并更新UI
-        // send location to java backend
-        // then can get recommendation songs from java backend
-
         showRecommendationSongsBasedOnLocation();
     }
 
