@@ -5,53 +5,71 @@
 
     <ImageView
         android:id="@+id/launcher_background_image"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background_spotify"/>
+        android:layout_width="230dp"
+        android:layout_height="222dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="38dp"
+        android:src="@drawable/background_fourtify"
+        />
 
     <TextView
-        android:id="@+id/launcher_name"
+        android:id="@+id/slogan1"
+        android:layout_below="@id/launcher_background_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Spotify Player"
-        android:textSize="60sp"
-        android:textColor="@color/spotify_green"
-        android:textStyle="bold"
-        android:fontFamily="@font/satisfy_regular"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="66dp"
-        android:layout_marginLeft="20dp"/>
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/lexenddeca_variablefont_wght"
+        android:text="@string/slogan1"
+        android:textColor="@color/spotify_green"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/slogan2"
+        android:layout_below="@+id/slogan1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="5dp"
+        android:fontFamily="@font/lexenddeca_variablefont_wght"
+        android:text="@string/slogan2"
+        android:textColor="@color/spotify_green"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
     <EditText
         android:id="@+id/username"
         style="@style/EditTextStyle"
-        android:layout_width="338dp"
-        android:layout_height="58dp"
+        android:layout_below="@+id/slogan2"
+        android:layout_width="300dp"
+        android:layout_height="48dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="380dp"
+        android:layout_marginTop="68dp"
         android:gravity="center"
         android:hint="Username"
-        android:textColor="@color/white"
-        android:textSize="26sp" />
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <EditText
         android:id="@+id/password"
         android:inputType="textPassword"
         android:layout_below="@+id/username"
         style="@style/EditTextStyle"
-        android:layout_width="338dp"
-        android:layout_height="58dp"
+        android:layout_width="300dp"
+        android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:hint="Password"
-        android:textColor="@color/white"
-        android:textSize="26sp" />
+        android:textColor="@color/black"
+        android:textSize="18sp" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/login_btn"
-        android:layout_width="338dp"
-        android:layout_height="58dp"
+        android:layout_width="300dp"
+        android:layout_height="48dp"
         android:layout_below="@+id/password"
         android:layout_centerInParent="true"
         android:layout_marginTop="12dp"
@@ -61,6 +79,6 @@
         android:text="Login"
         android:textAllCaps="false"
         android:textColor="@color/white"
-        android:textSize="28sp" />
+        android:textSize="20sp" />
 
 </RelativeLayout>

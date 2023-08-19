@@ -9,7 +9,7 @@
         android:id="@+id/playlist_detail_song_image"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/background_spotify"
+        android:src="@drawable/background_fourtify"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/playlist_detail_song_info"
         app:layout_constraintTop_toTopOf="parent"

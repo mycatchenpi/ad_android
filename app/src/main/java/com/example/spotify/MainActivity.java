@@ -19,7 +19,6 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -42,9 +41,6 @@ import com.example.spotify.model.dto.SongDTO;
 import com.example.spotify.model.dto.SongDataWithLocationDTO;
 import com.example.spotify.util.RetrofitUtil;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -66,44 +62,45 @@ public class MainActivity extends AppCompatActivity {
     private AppCompatButton mLogoutBtn;
     private TextView mHelloUser;
     private int mWidth;
-    private LocationCallback locationCallback;
     private FusedLocationProviderClient fusedLocationClient;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001;
-    private double savedLatitude;
-    private double savedLongitude;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // after user login, request user permission for location
+        // obtain an instance of FusedLocationProviderClient,
+        // which is responsible for accessing location information
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        showRecommendationSongsBasedOnLocation();
 
+        // after user login, check their location permission first inside this method
+        // if granted, send current location to restful api to get recommendation songs
+        // if didn't grant, request location permission
+        showRecommendationSongsBasedOnLocation();
+        mLocationLinearLayout = findViewById(R.id.user_location);
+        mLocationLinearLayout.removeAllViews();
+
+        // get and display username for greeting
         String username = getUsername();
         mHelloUser = (TextView) findViewById(R.id.hello_user);
         mHelloUser.setText("Hello " + username);
 
+        // get the width of user's device
         getDeviceWidth();
 
-        // daily playlists after user login
+        // show recommended daily songs after user login
         mLinearLayout = (LinearLayout) findViewById(R.id.user_dailyPlaylists);
         mLinearLayout.removeAllViews();
         showRecommendationDailySongs(username);
 
-        // recommendation songs based on location
-        mLocationLinearLayout = findViewById(R.id.user_location);
-        mLocationLinearLayout.removeAllViews();
-
-      //  showRecommendationSongsBasedOnLocation(username, 0,0);
-
-        // recommendation songs based on time
+        // show recommended songs based on current time
         mTimeLinearLayout = (LinearLayout) findViewById(R.id.user_time);
         mTimeLinearLayout.removeAllViews();
         showRecommendationSongsBasedOnTime(username);
 
-        // recommendation songs based on holiday
+        // show recommended songs based on holiday
         mHolidayLayout = (LinearLayout) findViewById(R.id.user_holiday_songs);
         mHolidayLayout.setVisibility(View.VISIBLE);
         mHolidayLayout.removeAllViews();
@@ -111,22 +108,12 @@ public class MainActivity extends AppCompatActivity {
 
         // Logout
         mLogoutBtn = (AppCompatButton) findViewById(R.id.logout_btn);
-        mLogoutBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clear();
-                Toast.makeText(MainActivity.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
-                Intent loginIntent = new Intent(MainActivity.this, LauncherActivity.class);
-                startActivity(loginIntent);
-            }
-        });
+        logout(mLogoutBtn);
     }
 
     // get username from shared preferences object
     private String getUsername() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sp.edit();
-
         String username = sp.getString("username", "");
         return username;
     }
@@ -138,23 +125,32 @@ public class MainActivity extends AppCompatActivity {
         mWidth = dm.widthPixels;
     }
 
+    // logout
+    private void logout(View v) {
+        v.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                clear();
+                Toast.makeText(MainActivity.this, "Logout Successfully!", Toast.LENGTH_SHORT).show();
+                Intent loginIntent = new Intent(MainActivity.this, LauncherActivity.class);
+                startActivity(loginIntent);
+            }
+        });
+    }
+
     // when user click log out button, clear user info from shared preferences
     private void clear() {
         SharedPreferences sp = getSharedPreferences("login_info", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sp.edit();
-
-        sp = getSharedPreferences("login_info", MODE_PRIVATE);
-        editor = sp.edit();
         editor.putString("username", "");
         editor.putString("password", "");
         editor.commit();
     }
 
     // after user login, when user click back key
-    // will restart current homepage activity
+    // will restart current homepage activity instead of go back to login page
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             // restart homepage and keep tasks
             Intent intent = new Intent(this, MainActivity.class);
@@ -165,6 +161,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
+    // after user login, check their location permission first
+    // if granted, send current location to java restful api to get recommended songs
+    // if didn't grant, request location permission
     private void showRecommendationSongsBasedOnLocation() {
         checkLocationPermission();
         Task<Location> lastLocation = fusedLocationClient.getLastLocation();
@@ -176,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    // utilize retrofit2 for connecting and accessing data from java restful api
     private void showRecommendationSongsBasedOnLocationRequestBackend(String username, double latitude, double longitude) {
         retrofit2.Call<List<SongDTO>> call = RetrofitUtil.getApiService().getRecommendationSongByLocation(
                 new ReceivedLocationDTO(latitude, longitude, username));
@@ -400,13 +400,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("SetTextI18n")
     private void addLocationTracks(int numOfTracks, Map<Integer, SongDTO> tracksMap) {
         int index = 0;
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout groupedItemLayout = (LinearLayout) LinearLayout.inflate(
                     MainActivity.this, R.layout.scrollview_location_groupeditem, null);
-            for (int j = 0; j < 3; j++) { // Assuming each grouped item contains 3 location items
+
+            // Assuming each grouped item contains 3 location items
+            for (int j = 0; j < 3; j++) {
                 View locationItem = groupedItemLayout.getChildAt(j);
                 ImageView imageView = locationItem.findViewById(R.id.location_image);
                 TextView nameView = locationItem.findViewById(R.id.location_song_name);
@@ -427,7 +428,7 @@ public class MainActivity extends AppCompatActivity {
                         .into(new SimpleTarget<Drawable>() {
                             @Override
                             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                imageView.setImageDrawable(resource); // 设置背景图片
+                              imageView.setImageDrawable(resource); // 设置背景图片
                             }
                         });
 
@@ -440,7 +441,6 @@ public class MainActivity extends AppCompatActivity {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
                             sendLocationToBackend(uri);
-                            //startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -478,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
                         .into(new SimpleTarget<Drawable>() {
                             @Override
                             public void onResourceReady(@NonNull Drawable resource, @Nullable Transition<? super Drawable> transition) {
-                                imageView.setImageDrawable(resource); // 设置背景图片
+                              imageView.setImageDrawable(resource); // 设置背景图片
                             }
                         });
 
@@ -491,7 +491,6 @@ public class MainActivity extends AppCompatActivity {
                         String url = (String) v.getTag(); // 从View的tag中获取url
                         if (url != null && !url.isEmpty()) {
                             sendLocationToBackend(uri);
-                           // startLocationUpdates();
                             startWebView(url);
                         }
                     }
@@ -614,15 +613,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopLocationUpdates();
-    }
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        stopLocationUpdates();
+//    }
 
-    private void stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback);
-    }
+//    private void stopLocationUpdates() {
+//        fusedLocationClient.removeLocationUpdates(locationCallback);
+//    }
 
     // after user granted for location permission from settings page
     // refresh main page with permission s

@@ -36,4 +36,7 @@
     <string name="title_current_track">Current Track</string>
     <string name="title_image_size">Image size</string>
     <string name="title_image_scale_type">Scale type</string>
+
+    <string name="slogan1">Recommend Amazing Songs</string>
+    <string name="slogan2">Based On Your Location And Time</string>
 </resources>

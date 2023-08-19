@@ -9,7 +9,7 @@
     <ImageView
         android:layout_height="64dp"
         android:layout_width="64dp"
-        android:src="@drawable/d0"
+        android:src="@drawable/background_fourtify"
         />
 
     <TextView

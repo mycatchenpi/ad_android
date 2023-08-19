@@ -11,7 +11,7 @@
         android:id="@+id/time_image"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@drawable/d0"
+        android:src="@drawable/background_fourtify"
         android:layout_marginLeft="10dp"
         android:layout_marginBottom="3dp"/>
 
