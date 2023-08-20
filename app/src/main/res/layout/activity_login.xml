@@ -49,7 +49,7 @@
         android:layout_marginTop="68dp"
         android:gravity="center"
         android:hint="Username"
-        android:textColor="@color/black"
+        android:textColor="@color/green"
         android:textSize="18sp" />
 
     <EditText
@@ -63,7 +63,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center"
         android:hint="Password"
-        android:textColor="@color/black"
+        android:textColor="@color/green"
         android:textSize="18sp" />
 
     <androidx.appcompat.widget.AppCompatButton

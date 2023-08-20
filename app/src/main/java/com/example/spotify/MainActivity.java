@@ -16,6 +16,8 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -39,7 +41,12 @@ import com.example.spotify.model.dto.ReceivedLocationDTO;
 import com.example.spotify.model.dto.SongDTO;
 import com.example.spotify.model.dto.SongDataWithLocationDTO;
 import com.example.spotify.util.RetrofitUtil;
+import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -69,9 +76,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // obtain an instance of FusedLocationProviderClient,
-        // which is responsible for accessing location information
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // check location permission and access last location info if user allowed location permission
+        initPermissionAndLocation();
 
         // after user login, check their location permission first inside this method
         // if granted, send current location to restful api to get recommendation songs
@@ -107,6 +113,40 @@ public class MainActivity extends AppCompatActivity {
         // Logout
         mLogoutBtn = (AppCompatButton) findViewById(R.id.logout_btn);
         logout(mLogoutBtn);
+    }
+
+    /**
+     * at the first time user login, will request user permission for location
+     * after user granted, access the last location info
+     */
+    private void initPermissionAndLocation() {
+        if (!isLocationPermission()) {
+            showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), 0.0, 0.0);
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    LOCATION_PERMISSION_REQUEST_CODE);
+        }
+
+        // obtain an instance of FusedLocationProviderClient,
+        // which is responsible for accessing location information
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        LocationRequest locationRequest = LocationRequest.create()
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY) // 设置请求优先级
+                .setInterval(10000) // 设置位置更新的时间间隔，单位为毫秒
+                .setFastestInterval(5000); // 设置最快的位置更新时间间隔，单位为毫秒
+
+        checkLocationPermission();
+        fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
+            @Override
+            public void onLocationAvailability(LocationAvailability locationAvailability) {
+                super.onLocationAvailability(locationAvailability);
+            }
+
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+
+            }
+        }, null);
     }
 
     /**
@@ -183,9 +223,29 @@ public class MainActivity extends AppCompatActivity {
         lastLocation.addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
-                showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), location.getLatitude(),location.getLongitude());
+                double lat = 0.0;
+                double lon = 0.0;
+                if (location != null) {
+                    lat = location.getLatitude();
+                    lon = location.getLongitude();
+                }
+                showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), lat, lon);
             }
         });
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+//            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+//                @Override
+//                public void onLocationChanged(@NonNull Location location) {
+//                    double latitude = location.getLatitude();
+//                    double longitude = location.getLongitude();
+//                    showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), location.getLatitude(), location.getLongitude());
+//                }
+//            });
+//        }
+
+        //fusedLocationClient.getCurrentLocation(CurrentLocationRequest currentLocationrequest, )
+
     }
 
     /**
@@ -524,13 +584,7 @@ public class MainActivity extends AppCompatActivity {
      * else location permission denied, set latitude = 0.0 & longitude = 0.0 and request for location permission
      */
     private void checkLocationPermission() {
-        if (isLocationPermission()) {
-        } else {
-            showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), 0.0, 0.0);
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                    LOCATION_PERMISSION_REQUEST_CODE);
-        }
+        isLocationPermission();
     }
 
     /**
@@ -651,5 +705,6 @@ public class MainActivity extends AppCompatActivity {
     private void refreshPage() {
         showRecommendationSongsBasedOnLocation();
     }
+
 
 }
