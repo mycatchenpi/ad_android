@@ -132,8 +132,8 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         LocationRequest locationRequest = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY) // 设置请求优先级
-                .setInterval(10000) // 设置位置更新的时间间隔，单位为毫秒
-                .setFastestInterval(5000); // 设置最快的位置更新时间间隔，单位为毫秒
+                .setInterval(5000) // 设置位置更新的时间间隔，单位为毫秒
+                .setFastestInterval(3000); // 设置最快的位置更新时间间隔，单位为毫秒
 
         checkLocationPermission();
         fusedLocationClient.requestLocationUpdates(locationRequest, new LocationCallback() {
@@ -144,7 +144,13 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onLocationResult(LocationResult locationResult) {
-
+                Location lastLocation = locationResult.getLastLocation();
+                if (lastLocation != null) {
+                    Log.d("onLocationResult", "Lat: " + lastLocation.getLatitude() + ", Lon: " + lastLocation.getLongitude());
+                } else {
+                    Log.d("onLocationResult", "onLocationResult is return null");
+                }
+                super.onLocationResult(locationResult);
             }
         }, null);
     }
