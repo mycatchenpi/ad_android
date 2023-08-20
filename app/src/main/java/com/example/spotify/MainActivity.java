@@ -232,20 +232,6 @@ public class MainActivity extends AppCompatActivity {
                 showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), lat, lon);
             }
         });
-//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-//            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-//                @Override
-//                public void onLocationChanged(@NonNull Location location) {
-//                    double latitude = location.getLatitude();
-//                    double longitude = location.getLongitude();
-//                    showRecommendationSongsBasedOnLocationRequestBackend(getUsername(), location.getLatitude(), location.getLongitude());
-//                }
-//            });
-//        }
-
-        //fusedLocationClient.getCurrentLocation(CurrentLocationRequest currentLocationrequest, )
-
     }
 
     /**
@@ -473,6 +459,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void addLocationTracks(int numOfTracks, Map<Integer, SongDTO> tracksMap) {
+        mLocationLinearLayout.removeAllViews();
         int index = 0;
         for (int i = 0; i < numOfTracks; i++) {
             LinearLayout groupedItemLayout = (LinearLayout) LinearLayout.inflate(
@@ -512,6 +499,7 @@ public class MainActivity extends AppCompatActivity {
             }
             mLocationLinearLayout.addView(groupedItemLayout);
         }
+        Log.d("index", String.valueOf(index));
     }
 
     private void addTimeTracks(int numOfTracks, Map<Integer, SongDTO> tracksMap) {
